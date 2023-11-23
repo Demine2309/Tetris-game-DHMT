@@ -8,8 +8,15 @@ Piece::Piece()
 	Piece(0);
 }
 
+// Lấy ma trận biểu diễn cho khối dựa trên độ xoay hiện tại
+const int* Piece::getPieceMatrix()
+{
+    return gamePieces[type][rotation];
+}
+
 // Mảng màu sắc tương ứng với các loại khối
-const float pieceColors[][3] = {
+const float pieceColors[][3] = 
+{
     {1.0, 0.75, 0.79},  // Loại 0
     {1.0, 0.75, 0.79},  // Loại 1
     {1.0, 0.75, 0.79},  // Loại 2
@@ -50,10 +57,4 @@ void Piece::rotatePiece(int dir)
         // Xoay ngược chiều kim đồng hồ
         rotation = (rotation + 3) % 4;
     }
-}
-
-// Lấy ma trận biểu diễn cho khối dựa trên độ xoay hiện tại
-const int* Piece::getPieceMatrix()
-{
-    return gamePieces[type][rotation];
 }

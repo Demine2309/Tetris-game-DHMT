@@ -60,12 +60,12 @@ void timer(int id)
 	}
 }
 
-// Xử lý các thao tác: nhấn 'F1' để chơi lại game, nhấn 'F2' để pause game và các phím mũi tên để xoay và di chuyển các khối
+// Xử lý các thao tác: nhấn 'F1' để chơi màn khác, nhấn 'F2' để pause game và các phím mũi tên để xoay và di chuyển các khối
 void Handler(int key, int x, int y)
 {
 	if (game.paused && game.killed)
 	{
-		if (key == GLUT_KEY_F1)		// 13 = "ENTER"
+		if (key == GLUT_KEY_F1)
 		{
 			game.killed = false;
 			game.restart();
@@ -164,7 +164,7 @@ void display(void)
 			BitmapText(msg, 155, VPHEIGHT / 2 + 50);
 			sprintf_s(msg, N, "YOUR SCORE: %d", game.score);
 			BitmapText(msg, 140, VPHEIGHT / 2);
-			sprintf_s(msg, N, "Press ENTER to restart game...");
+			sprintf_s(msg, N, "Press F1 to restart game...");
 			BitmapText(msg, 75, VPHEIGHT / 2 - 150);
 		}
 	}
