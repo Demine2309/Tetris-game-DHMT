@@ -23,6 +23,7 @@ void Game::update()
 		{								
 			updateActiveAfterCollision();	// Cố định khối tại vị trí va chạm
 			checkLine();					// Kiểm tra xem có dòng nào đã đầy không
+
 			if (deleteLines)				// Nếu có dòng cần xóa, xóa các dòng đã đầy
 				clearLine();				
 			genNextPiece();					// Tạo khối mới
@@ -104,12 +105,12 @@ void Game::move(int dir)
 // Xóa phần màn hình của game
 void Game::clearMainGrid()
 {
-	for (int r = 0; r < ROWS; r++)
+	for (int row = 0; row < ROWS; row++)
 	{
-		for (int c = 0; c < COLS; c++)
+		for (int col = 0; col < COLS; col++)
 		{
-			mainGrid[r][c].isFilled = false;
-			mainGrid[r][c].isActive = false;
+			mainGrid[row][col].isFilled = false;
+			mainGrid[row][col].isActive = false;
 		}
 	}
 }
@@ -117,12 +118,12 @@ void Game::clearMainGrid()
 // Xóa và reset lại phần màn phụ
 void Game::clearNextPieceGrid()
 {
-	for (int r = 0; r < 5; r++)
+	for (int row = 0; row < 5; row++)
 	{
-		for (int c = 0; c < 5; c++)
+		for (int col = 0; col < 5; col++)
 		{
-			nextPieceGrid[r][c].isFilled = false;
-			nextPieceGrid[r][c].isActive = false;
+			nextPieceGrid[row][col].isFilled = false;
+			nextPieceGrid[row][col].isActive = false;
 		}
 	}
 }
@@ -195,10 +196,7 @@ void Game::rotateShape(int dir)
 // Kiểm tra xem một mảnh có thể xoay được hay không
 bool Game::canRotate(Piece activeP)
 {
-	if (rotationCollision())
-		return false;
-	else
-		return true;
+	return !rotationCollision();
 }
 
 // Kiểm tra va chạm khi xoay một mảnh
@@ -257,13 +255,13 @@ void Game::checkLine()
 {
 	int fullRows = 0;
 
-	for (int r = 0; r < ROWS; r++)
+	for (int row = 0; row < ROWS; row++)
 	{
 		bool fullRow = false;
 
-		for (int c = 0; c < COLS; c++)
+		for (int col = 0; col < COLS; col++)
 		{
-			Square& square = mainGrid[r][c];
+			Square& square = mainGrid[row][col];
 
 			if (square.isFilled)
 				fullRow = true;
@@ -273,11 +271,12 @@ void Game::checkLine()
 				break;
 			}
 		}
+
 		if (fullRow)
 		{
-			for (int c = 0; c < COLS; c++)
+			for (int col = 0; col < COLS; col++)
 			{
-				mainGrid[r][c].toBeDeleted = true;
+				mainGrid[row][col].toBeDeleted = true;
 			}
 
 			deleteLines = true;
@@ -289,26 +288,26 @@ void Game::checkLine()
 // Xóa một dòng đã đầy và di chuyển tất cả các khối xuống một ô 
 void Game::clearLine()
 {
-	for (int r = ROWS - 1; r > 0; r--) // Kiểm tra từng dòng
+	for (int row = ROWS - 1; row > 0; row--) // Kiểm tra từng dòng
 	{
 		int linesDeleted = 0;
 
-		if (mainGrid[r][0].toBeDeleted) // Di chuyển tất cả các dòng xuống một ô
+		if (mainGrid[row][0].toBeDeleted) // Di chuyển tất cả các dòng xuống một ô
 		{
-			for (int r2 = r; r2 > 0; r2--)
+			for (int row2 = row; row2 > 0; row2--)
 			{
-				for (int c = 0; c < COLS; c++)
+				for (int col = 0; col < COLS; col++)
 				{
-					mainGrid[r2][c].isFilled = mainGrid[r2 - 1][c].isFilled;
-					mainGrid[r2][c].isActive = mainGrid[r2 - 1][c].isActive;
-					mainGrid[r2][c].toBeDeleted = mainGrid[r2 - 1][c].toBeDeleted;
-					mainGrid[r2][c].red = mainGrid[r2 - 1][c].red;
-					mainGrid[r2][c].green = mainGrid[r2 - 1][c].green;
-					mainGrid[r2][c].blue = mainGrid[r2 - 1][c].blue;
+					mainGrid[row2][col].isFilled = mainGrid[row2 - 1][col].isFilled;
+					mainGrid[row2][col].isActive = mainGrid[row2 - 1][col].isActive;
+					mainGrid[row2][col].toBeDeleted = mainGrid[row2 - 1][col].toBeDeleted;
+					mainGrid[row2][col].red = mainGrid[row2 - 1][col].red;
+					mainGrid[row2][col].green = mainGrid[row2 - 1][col].green;
+					mainGrid[row2][col].blue = mainGrid[row2 - 1][col].blue;
 				}
 			}
 
-			r++;
+			row++;
 		}
 	}
 

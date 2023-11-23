@@ -60,48 +60,42 @@ void timer(int id)
 	}
 }
 
-// Xử lý các thao tác: ENTER để chơi lại game, 'P' để pause game
-void keyboard(unsigned char key, int x, int y)
+// Xử lý các thao tác: nhấn 'F1' để chơi lại game, nhấn 'F2' để pause game và các phím mũi tên để xoay và di chuyển các khối
+void Handler(int key, int x, int y)
 {
 	if (game.paused && game.killed)
 	{
-		if (key == 13)
+		if (key == GLUT_KEY_F1)		// 13 = "ENTER"
 		{
 			game.killed = false;
 			game.restart();
 			glutTimerFunc(game.timer, timer, 0);
+
+			glutPostRedisplay();
 		}
 	}
 	else
 	{
-		if (key == 'p')
+		if (key == GLUT_KEY_F2)
 		{
 			game.paused = !game.paused;
 
 			if (!game.paused)
 				glutTimerFunc(game.timer, timer, 0);
+
+			glutPostRedisplay();
 		}
-	}
-
-	glutPostRedisplay();
-}
-
-// Xủ lý các thao tác điều khiển khối với 4 phím mũi tên
-void special(int key, int x, int y)
-{
-	if (!game.paused && !game.killed)  
-	{
-		if (key == GLUT_KEY_LEFT)
+		else if (key == GLUT_KEY_LEFT)
 		{
 			game.move(-1);
 			glutPostRedisplay();
 		}
-		else if (key == GLUT_KEY_RIGHT) 
+		else if (key == GLUT_KEY_RIGHT)
 		{
 			game.move(1);
 			glutPostRedisplay();
 		}
-		else if (key == GLUT_KEY_UP) 
+		else if (key == GLUT_KEY_UP)
 		{
 			game.rotateShape(1);
 			glutPostRedisplay();
@@ -120,34 +114,33 @@ void display(void)
 	const int N = 100;
 	char msg[N + 1];
 
-	glClearColor(0.2f, 0.2f, 0.2f, 0.72);
+	glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Grid
-	glViewport(0, 0, VPWIDTH, VPHEIGHT);
+	glViewport(0, 0, VPWIDTH + 40, VPHEIGHT);
 	glMatrixMode(GL_PROJECTION);
 
 	if (!game.paused) // Nếu trò chơi đang hoạt động, di chuyển các khối
-	{	
-
+	{
 		glLoadIdentity();
 		gluOrtho2D(0, COLS, ROWS, 0);
 
-		for (int r = 0; r < ROWS; r++)  
+		for (int row = 0; row < ROWS; row++)
 		{
-			for (int c = 0; c < COLS; c++)
+			for (int col = 0; col < COLS; col++)
 			{
-				Square& square = game.mainGrid[r][c];
+				Square& square = game.mainGrid[row][col];
 
-				if (square.isFilled) 
+				if (square.isFilled)
 				{
 					glColor3f(square.red, square.green, square.blue);
-					glRectd(c + .1, r + .1, c + .9, r + .9);
+					glRectd(col + 0.1, row + 0.1, col + 0.9, row + 0.9);
 				}
-				else 
+				else
 				{
 					glColor3f(0.2, 0.2, 0.2);
-					glRectd(c, r, c + 1, r + 1);
+					glRectd(col, row, col + 1, row + 1);
 				}
 			}
 		}
@@ -171,19 +164,19 @@ void display(void)
 			BitmapText(msg, 155, VPHEIGHT / 2 + 50);
 			sprintf_s(msg, N, "YOUR SCORE: %d", game.score);
 			BitmapText(msg, 140, VPHEIGHT / 2);
-			sprintf_s(msg, N, "Press [ENTER] to restart ...");
-			BitmapText(msg, 75, VPHEIGHT / 2 - 100);
+			sprintf_s(msg, N, "Press ENTER to restart game...");
+			BitmapText(msg, 75, VPHEIGHT / 2 - 150);
 		}
 	}
 
 	// Vạch dọc chia màn game
-	glViewport(VPWIDTH, 0, VPWIDTH, VPHEIGHT);
+	glViewport(VPWIDTH + 40, 0, VPWIDTH, VPHEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, VPWIDTH, 0, VPHEIGHT);
 
 	glBegin(GL_LINES);
-	glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1.0, 0, 0);
 	glVertex2d(1, 0);
 	glVertex2d(1, glutGet(GLUT_WINDOW_HEIGHT));
 	glEnd();
@@ -193,34 +186,37 @@ void display(void)
 	gluOrtho2D(50, VPWIDTH, 50, VPHEIGHT);
 
 	glColor3f(1, 1, 1);
-	sprintf_s(msg, N, "SCORE %d", game.score);
-	BitmapText(msg, 80, 300);
+	sprintf_s(msg, N, "NEXT PIECE");
+	BitmapText(msg, 170, VPHEIGHT - 50);
 	sprintf_s(msg, N, "NGUYEN NHU CUONG - 20200076");
-	BitmapText(msg, 80, 350);
-	sprintf_s(msg, N, "NEXT PIECE:");
-	BitmapText(msg, 80, VPHEIGHT - 50);
+	BitmapText(msg, 100, 450);
+	sprintf_s(msg, N, "SCORE %d", game.score);
+	BitmapText(msg, 180, 380);
+	sprintf_s(msg, N, "DO HOA MAY TINH - MI4382");
+	BitmapText(msg, 110, 300);
 
 	// Thông tin "NEXT PIECE"
-	glViewport(VPWIDTH + 180, -50, VPWIDTH, VPHEIGHT);
+	glViewport(VPWIDTH + 180, -60, VPWIDTH, VPHEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, COLS, ROWS, 0);
 
-	for (int r = 1; r < 5; r++) 
+	for (int row = 1; row < 5; row++)
 	{
-		for (int c = 0; c < 2; c++) 
+		for (int col = 0; col < 2; col++)
 		{
-			Square& square = game.nextPieceGrid[r][c];
+			// Truy cập đối tượng Square tại vị trí hiện tại trong grid của màm phụ
+			Square& square = game.nextPieceGrid[row][col];
 
 			if (square.isFilled)
 			{
 				glColor3f(square.red, square.green, square.blue);
-				glRectd(c + .1, r + .1, c + .9, r + .9);
+				glRectd(col + 0.1, row + 0.1, col + 0.9, row + 0.9);
 			}
 			else
 			{
 				glColor3f(0.2, 0.2, 0.2);
-				glRectd(c, r, c + 1, r + 1);
+				glRectd(col, row, col + 1, row + 1);
 			}
 		}
 	}
@@ -241,8 +237,7 @@ void main(int argc, char* argv[])
 	glutCreateWindow("Tetris");
 
 	glutDisplayFunc(display);
-	glutSpecialFunc(special);
-	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(Handler);
 	glutTimerFunc(game.timer, timer, 0);
 
 	glutMainLoop();
